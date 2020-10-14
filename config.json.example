@@ -1,0 +1,8 @@
+{
+    "slack_api_key": "xoxp-1234567890-1234567890-1234567890-12cba22241414afe2142",
+    "slack_user_id": "U9XACLZXI",
+    "default_status_text": "",
+    "default_status_emoji": "",
+    "loop_time": 30,
+    "debug": false
+}

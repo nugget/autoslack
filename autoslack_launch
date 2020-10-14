@@ -1,0 +1,4 @@
+#!/bin/sh
+
+PATH=/usr/local/bin:/usr/bin:/bin:/opt/bin
+tmux new-session -A -d -s autoslack $HOME/bin/autoslack
