@@ -12,3 +12,6 @@ reflect whenever I am in a Highfive video call.
   ```
   @reboot $HOME/bin/autoslack_launch
   ```
+
+The autolaunch script expects `tmux` to be installed.  That's not needed for
+the service itself, but just how I chose to wrap it.
