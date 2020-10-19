@@ -44,7 +44,7 @@ var DEFAULT = SlackStatus{
 }
 
 func setStatus(api *slack.Client, newStatus SlackStatus) error {
-	moo, err := api.GetUserProfile("U4XDDLMFY", true)
+	moo, err := api.GetUserProfile(config.SlackUserID, true)
 	if err != nil {
 		return err
 	}
