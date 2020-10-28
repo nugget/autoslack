@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/syslog"
 	"os"
 	"path"
@@ -20,30 +21,30 @@ var (
 )
 
 type AutoSlackConfig struct {
-	SlackUserID  string `json:"slack_user_id"`
-	SlackAPIKey  string `json:"slack_api_key"`
-	LoopTime     int    `json:"loop_time"`
-	Debug        bool   `json:"debug"`
-	DefaultText  string `json:"default_status_text"`
-	DefaultEmoji string `json:"default_status_emoji"`
+	SlackUserID   string      `json:"slack_user_id"`
+	SlackAPIKey   string      `json:"slack_api_key"`
+	LoopTime      int         `json:"loop_time"`
+	Debug         bool        `json:"debug"`
+	DefaultStatus SlackStatus `json:"default_status"`
+	States        []Trigger   `json:"states"`
+}
+
+type Trigger struct {
+	Process string      `json:"process"`
+	Status  SlackStatus `json:"status"`
 }
 
 type SlackStatus struct {
-	Text  string `json:"status_text"`
-	Emoji string `json:"status_emoji"`
-}
-
-var HIGHFIVE = SlackStatus{
-	Text:  "Highfive call",
-	Emoji: ":highfive:",
-}
-
-var DEFAULT = SlackStatus{
-	Text:  "",
-	Emoji: "",
+	Text  string `json:"text"`
+	Emoji string `json:"emoji"`
 }
 
 func setStatus(api *slack.Client, newStatus SlackStatus) error {
+	log.WithFields(logrus.Fields{
+		"emoji": newStatus.Emoji,
+		"text":  newStatus.Text,
+	}).Debug("setStatus")
+
 	moo, err := api.GetUserProfile(config.SlackUserID, true)
 	if err != nil {
 		return err
@@ -52,13 +53,21 @@ func setStatus(api *slack.Client, newStatus SlackStatus) error {
 	if newStatus.Text == moo.StatusText && newStatus.Emoji == moo.StatusEmoji {
 		log.Debug("No change to status")
 	} else {
+		log.WithFields(logrus.Fields{
+			"emoji": newStatus.Emoji,
+			"text":  newStatus.Text,
+		}).Info("Setting Slack Status")
 		return api.SetUserCustomStatusWithUser(config.SlackUserID, newStatus.Text, newStatus.Emoji, 0)
 	}
 
 	return nil
 }
 
-func highFiveIsRunning() bool {
+func lookForProcess(name string) bool {
+	log.WithFields(logrus.Fields{
+		"name": name,
+	}).Debug("lookForProcess")
+
 	plist, err := ps.Processes()
 	if err != nil {
 		log.WithError(err).Error("Can't get system process list")
@@ -66,7 +75,7 @@ func highFiveIsRunning() bool {
 	}
 
 	for _, p := range plist {
-		if p.Executable() == "Highfive" {
+		if p.Executable() == name {
 			return true
 		}
 	}
@@ -106,42 +115,66 @@ func loadConfig(file string) (c AutoSlackConfig) {
 		log.SetLevel(logrus.DebugLevel)
 	}
 
-	DEFAULT.Text = c.DefaultText
-	DEFAULT.Emoji = c.DefaultEmoji
+	if c.Debug {
+		fmt.Println("-- ")
+		fmt.Printf("%+v\n", c)
+		fmt.Println("-- ")
+	}
 
 	return c
 }
 
 func main() {
+	var lastStatus string
+
 	initLog()
 	config = loadConfig(path.Join(os.Getenv("HOME"), ".config", "autoslack", "config.json"))
 
 	api := slack.New(config.SlackAPIKey)
 
-	lastStatus := !highFiveIsRunning()
-
 	for {
-		highfiveStatus := highFiveIsRunning()
-		if highfiveStatus == lastStatus {
-			log.Debug("Highfive state is unchanged")
-		} else {
-			lastStatus = highfiveStatus
+		found := false
 
-			setTo := DEFAULT
-
-			if highfiveStatus {
-				setTo = HIGHFIVE
-			}
-
-			err := setStatus(api, setTo)
-			if err != nil {
-				log.WithError(err).Error("Unable to set status")
-			}
+		for _, trigger := range config.States {
 			log.WithFields(logrus.Fields{
-				"text":  setTo.Text,
-				"emoji": setTo.Emoji,
-			}).Warning("Set Slack status")
+				"Process":    trigger.Process,
+				"lastStatus": lastStatus,
+			}).Debug("Looking for process")
+
+			if lookForProcess(trigger.Process) {
+				found = true
+
+				if trigger.Process == lastStatus {
+					log.Debug("Same Process")
+				} else {
+					log.Debug("New Process")
+
+					err := setStatus(api, trigger.Status)
+					if err != nil {
+						log.WithError(err).Error("Unable to set status")
+					} else {
+						lastStatus = trigger.Process
+					}
+					break
+				}
+			} else {
+				log.Debug("Process Not Found")
+			}
 		}
+
+		if !found {
+			log.Debug("Not Found")
+			if lastStatus != "" {
+				err := setStatus(api, config.DefaultStatus)
+				if err != nil {
+					log.WithError(err).Error("Unable to set status")
+				} else {
+					lastStatus = ""
+				}
+			}
+		}
+
+		log.Debug("-- ")
 		time.Sleep(time.Duration(config.LoopTime) * time.Second)
 		log.WithFields(logrus.Fields{
 			"seconds": config.LoopTime,
