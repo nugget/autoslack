@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/nugget/autoslack)](https://goreportcard.com/report/github.com/nugget/autoslack)
+[![Go](https://github.com/nugget/autoslack/workflows/Go/badge.svg)](https://github.com/nugget/autoslack/actions?query=workflow%3AGo) [![Go Report Card](https://goreportcard.com/badge/github.com/nugget/autoslack)](https://goreportcard.com/report/github.com/nugget/autoslack)
 
 # Nugget's Autoslack
 
