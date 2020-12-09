@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/nugget/autoslack)](https://goreportcard.com/report/github.com/nugget/autoslack)
+
 # Nugget's Autoslack
 
 This is a little service I run on my machine that updates my Slack status to
