@@ -20,6 +20,7 @@ var (
 	config AutoSlackConfig
 )
 
+// AutoSlackConfig contains the configuration data loaded from the config file
 type AutoSlackConfig struct {
 	SlackUserID   string      `json:"slack_user_id"`
 	SlackAPIKey   string      `json:"slack_api_key"`
@@ -29,11 +30,15 @@ type AutoSlackConfig struct {
 	States        []Trigger   `json:"states"`
 }
 
+// Trigger represents a process that, when seen locally, triggers an update to
+// the users's Slack status
 type Trigger struct {
 	Process string      `json:"process"`
 	Status  SlackStatus `json:"status"`
 }
 
+// SlackStatus embodies the text and icon associated with a specific Slack
+// status update
 type SlackStatus struct {
 	Text  string `json:"text"`
 	Emoji string `json:"emoji"`
