@@ -6,6 +6,7 @@
     "default_status": {"emoji": ":footprints:", "text": "Relentless forward progress"},
     "states": [
         {"process": "Highfive", "status": {"emoji": ":highfive:", "text": "Highfive call"}},
-        {"process": "zoom.us", "status": {"emoji": ":zoom:", "text": "Zoom call"}}
+        {"process": "CptHost", "status": {"emoji": ":zoom:", "text": "Zoom call (active)"}}
+        {"process": "zoom.us", "status": {"emoji": ":zoom:", "text": "Zoom app is running"}}
     ]
 }

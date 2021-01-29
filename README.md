@@ -10,6 +10,14 @@ you, even better.
 
 PRs happily accepted.
 
+### Configuration (Zoom)
+
+* If you want to update your status whenever the Zoom client is running
+  locally, you should trigger on the `zoom.us` process name.  If you only want
+  your status updated when you are actively on a Zoom call, you should trigger
+  on the `CptHost` process name.  Both process names are in the sample config
+  file and you probably only want one of them.
+
 ## Installation
 
 * `cp config.json.example config.json`
