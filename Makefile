@@ -1,8 +1,13 @@
 BINDIR		?=$(HOME)/bin
 CONFDIR		?=$(HOME)/.config/autoslack
 
+.PHONY: clean
+
 autoslack: go.mod go.sum main.go
 	go build .
+
+clean:
+	rm -f autoslack
 
 install: autoslack config.json
 	@echo "Installing autoslack and user config"
