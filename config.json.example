@@ -8,6 +8,6 @@
         {"process": "Highfive", "status": {"emoji": ":highfive:", "text": "Highfive call"}},
         {"process": "CptHost", "status": {"emoji": ":zoom:", "text": "Zoom call (active)"}},
         {"process": "zoom.us", "status": {"emoji": ":zoom:", "text": "Zoom app is running"}},
-        {"process": "Amazon Chime", "status": {"emoji": ":zoom:", "text": "Amazon Chime call"}}
+        {"process": "Amazon Chime", "status": {"emoji": ":chime:", "text": "Amazon Chime call"}}
     ]
 }
